@@ -1,9 +1,6 @@
 package org.sefglobal.giraffe.api.dao;
 
-import org.sefglobal.giraffe.api.beans.Entity;
-import org.sefglobal.giraffe.api.beans.PaginatedResult;
-import org.sefglobal.giraffe.api.beans.PaginatedScoreResult;
-import org.sefglobal.giraffe.api.beans.Score;
+import org.sefglobal.giraffe.api.beans.*;
 import org.sefglobal.giraffe.api.exception.BadRequestException;
 import org.sefglobal.giraffe.api.exception.ResourceNotFoundException;
 import org.sefglobal.giraffe.api.util.BeanUtil;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,7 +141,9 @@ public class ScoreDAO {
                 "WHERE " +
                 "   entity_id=? " +
                 "   AND " +
-                "   status='ACTIVE'" +
+                "   status='ACTIVE' " +
+                "ORDER BY " +
+                "   id DESC " +
                 "LIMIT " +
                 "   ?, ?";
 
@@ -155,6 +152,77 @@ public class ScoreDAO {
                     sqlQuery,
                     new Object[]{id, offset, limit},
                     (rs, rowNum) -> BeanUtil.getScoreFromResultSet(rs)
+            );
+        } catch (DataAccessException e) {
+            logger.error("Unable to get entity info", e);
+        }
+        return null;
+    }
+
+    public PaginatedResult getPaginatedEntitiesWithPointsByBoardId(int boardId, int limit, int offset) throws ResourceNotFoundException {
+        String sqlQuery = "" +
+                "SELECT " +
+                "   COUNT(id) as count " +
+                "FROM " +
+                "   score " +
+                "WHERE " +
+                "   entity_id=? " +
+                "   AND " +
+                "   status='ACTIVE'";
+        int count;
+        try {
+            count = jdbcTemplate.queryForObject(
+                    sqlQuery,
+                    new Object[]{boardId},
+                    (rs, rowNum) -> rs.getInt("count")
+            );
+        } catch (DataAccessException e) {
+            logger.error("Unable to get entity info", e);
+            throw new ResourceNotFoundException();
+        }
+
+        return new PaginatedResult(count, getEntityWithPointsByBoardId(boardId, limit, offset));
+    }
+
+    public List<EntityWithPoints> getEntityWithPointsByBoardId(int boardId, int limit, int offset) {
+        String sqlQuery = "" +
+                "SELECT " +
+                "   e.*, " +
+                "   SUM(s.points) as points, " +
+                "   RANK() " +
+                "       OVER (" +
+                "           ORDER BY SUM(s.points) DESC " +
+                "       ) `rank` " +
+                "FROM " +
+                "       entity e " +
+                "   INNER JOIN " +
+                "       score s " +
+                "   ON " +
+                "       e.id = s.entity_id " +
+                "   INNER JOIN " +
+                "       board b " +
+                "   ON " +
+                "       e.board_id = b.id " +
+                "WHERE " +
+                "   b.status = 'ACTIVE' " +
+                "   AND " +
+                "   b.id = ? " +
+                "   AND " +
+                "   e.status='ACTIVE' " +
+                "   AND " +
+                "   s.status='ACTIVE'" +
+                "GROUP BY " +
+                "   entity_id " +
+                "ORDER BY " +
+                "   points DESC " +
+                "LIMIT " +
+                "   ?, ?";
+
+        try {
+            return jdbcTemplate.query(
+                    sqlQuery,
+                    new Object[]{boardId, offset, limit},
+                    (rs, rowNum) -> BeanUtil.getEntityWithPointsFromResultSet(rs)
             );
         } catch (DataAccessException e) {
             logger.error("Unable to get entity info", e);

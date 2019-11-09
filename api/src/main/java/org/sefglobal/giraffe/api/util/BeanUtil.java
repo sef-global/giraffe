@@ -2,6 +2,7 @@ package org.sefglobal.giraffe.api.util;
 
 import org.sefglobal.giraffe.api.beans.Board;
 import org.sefglobal.giraffe.api.beans.Entity;
+import org.sefglobal.giraffe.api.beans.EntityWithPoints;
 import org.sefglobal.giraffe.api.beans.Score;
 
 import java.sql.ResultSet;
@@ -43,4 +44,20 @@ public class BeanUtil {
 
         return score;
     }
+
+    public static EntityWithPoints getEntityWithPointsFromResultSet(ResultSet resultSet) throws SQLException {
+        EntityWithPoints entityWithPoints = new EntityWithPoints();
+
+        entityWithPoints.setId(resultSet.getInt("id"));
+        entityWithPoints.setName(resultSet.getString("name"));
+        entityWithPoints.setImage(resultSet.getString("image"));
+        entityWithPoints.setBoardId(resultSet.getInt("board_id"));
+        entityWithPoints.setStatus(resultSet.getString("status"));
+        entityWithPoints.setPoints(resultSet.getInt("points"));
+        entityWithPoints.setRank(resultSet.getInt("rank"));
+
+        return entityWithPoints;
+    }
+
+
 }

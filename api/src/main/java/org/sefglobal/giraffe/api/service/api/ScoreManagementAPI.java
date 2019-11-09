@@ -26,6 +26,15 @@ public class ScoreManagementAPI {
         return scoreDAO.getPaginatedScoreByEntityId(entityId, limit, offset);
     }
 
+    @GetMapping("boards/{boardId}/scores")
+    public PaginatedResult getBoardLeaderBoard(
+            @PathVariable int boardId,
+            @RequestParam int limit,
+            @RequestParam int offset
+    ) throws ResourceNotFoundException {
+        return scoreDAO.getPaginatedEntitiesWithPointsByBoardId(boardId,limit,offset);
+    }
+
     @PostMapping("/entities/{entityId}/scores")
     public Score addScore(@RequestBody Score score, @PathVariable int entityId) throws GiraffeAPIException {
         score.setEntityId(entityId);
