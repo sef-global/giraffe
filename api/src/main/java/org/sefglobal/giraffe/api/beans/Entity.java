@@ -5,17 +5,17 @@ public class Entity {
     private String name;
     private String image;
     private String status;
-    private int eventId;
+    private int boardId;
 
     public Entity() {
     }
 
-    public Entity(int id, String name, String image, String status, int eventId) {
+    public Entity(int id, String name, String image, String status, int boardId) {
         this.id = id;
         this.name = name;
         this.image = image;
         this.status = status;
-        this.eventId = eventId;
+        this.boardId = boardId;
     }
 
     public int getId() {
@@ -50,11 +50,11 @@ public class Entity {
         this.status = status;
     }
 
-    public int getEventId() {
-        return eventId;
+    public int getBoardId() {
+        return boardId;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setBoardId(int boardId) {
+        this.boardId = boardId;
     }
 }

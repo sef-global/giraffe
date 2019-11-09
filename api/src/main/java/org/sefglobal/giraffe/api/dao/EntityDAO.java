@@ -1,67 +1,64 @@
 package org.sefglobal.giraffe.api.dao;
 
-import org.sefglobal.giraffe.api.beans.Board;
+import org.sefglobal.giraffe.api.beans.Entity;
 import org.sefglobal.giraffe.api.exception.BadRequestException;
 import org.sefglobal.giraffe.api.exception.ResourceNotFoundException;
 import org.sefglobal.giraffe.api.util.BeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.PreparedStatement;
 import java.util.List;
 
 @Repository
-public class BoardDAO {
+public class EntityDAO {
 
-    private Logger logger = LoggerFactory.getLogger(BoardDAO.class);
+    private Logger logger = LoggerFactory.getLogger(EntityDAO.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<Board> getAllBoards() {
+    public List<Entity> getAllEntities() {
         String sqlQuery = "" +
                 "SELECT " +
                 "   * " +
                 "FROM " +
-                "   board " +
+                "   entity " +
                 "WHERE " +
                 "   status = 'ACTIVE'";
 
         try {
             return jdbcTemplate.query(
                     sqlQuery,
-                    (rs, rowNum) -> BeanUtil.getBoardFromResultSet(rs)
+                    (rs, rowNum) -> BeanUtil.getEntityFromResultSet(rs)
             );
         } catch (DataAccessException e) {
-            logger.error("Unable to get event info", e);
+            logger.error("Unable to get entity info", e);
         }
         return null;
     }
 
-    public Board addBoard(Board board) throws BadRequestException, ResourceNotFoundException {
-        if (board.getTitle() == null ||
-                board.getTitle().equals("") ||
-                board.getImage() == null ||
-                board.getImage().equals("")) {
+    public Entity addEntity(Entity entity) throws BadRequestException, ResourceNotFoundException {
+        if (entity.getName() == null ||
+                entity.getName().equals("") ||
+                entity.getImage() == null ||
+                entity.getImage().equals("")) {
             throw new BadRequestException("Bad Request");
         }
 
         String sqlQuery = "" +
                 "INSERT INTO" +
-                "   board(" +
-                "       title, " +
+                "   entity(" +
+                "       name, " +
                 "       image, " +
-                "       description, " +
+                "       board_id, " +
                 "       status" +
                 "   ) " +
                 "VALUES " +
@@ -71,25 +68,25 @@ public class BoardDAO {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sqlQuery, new String[]{"id"});
-                ps.setString(1, board.getTitle());
-                ps.setString(2, board.getImage());
-                ps.setString(3, board.getDescription());
+                ps.setString(1, entity.getName());
+                ps.setString(2, entity.getImage());
+                ps.setInt(3, entity.getBoardId());
                 return ps;
             }, keyHolder);
             int key = keyHolder.getKey().intValue();
-            return getBoardById(key);
+            return getEntityById(key);
         } catch (DataAccessException e) {
-            logger.error("Unable to get Board info", e);
+            logger.error("Unable to get Entity info", e);
         }
         return null;
     }
 
-    public Board getBoardById(int id) throws ResourceNotFoundException {
+    public Entity getEntityById(int id) throws ResourceNotFoundException {
         String sqlQuery = "" +
                 "SELECT " +
                 "   * " +
                 "FROM " +
-                "   board " +
+                "   entity " +
                 "WHERE " +
                 "   id=? " +
                 "   AND " +
@@ -99,18 +96,18 @@ public class BoardDAO {
             return jdbcTemplate.queryForObject(
                     sqlQuery,
                     new Object[]{id},
-                    (rs, rowNum) -> BeanUtil.getBoardFromResultSet(rs)
+                    (rs, rowNum) -> BeanUtil.getEntityFromResultSet(rs)
             );
         } catch (DataAccessException e) {
             logger.error("Unable to get info of '" + id + "'", e);
-            throw new ResourceNotFoundException("Board not found");
+            throw new ResourceNotFoundException("Entity not found");
         }
     }
 
-    public void removeBoard(int id, HttpServletResponse response) throws ResourceNotFoundException {
+    public void removeEntity(int id, HttpServletResponse response) throws ResourceNotFoundException {
         String sqlQuery = "" +
                 "UPDATE " +
-                "   board " +
+                "   entity " +
                 "SET " +
                 "   status = 'REMOVED' " +
                 "WHERE " +
@@ -120,7 +117,7 @@ public class BoardDAO {
             jdbcTemplate.update(sqlQuery, id);
         } catch (DataAccessException e) {
             logger.error("Unable remove '" + id + "'", e);
-            throw new ResourceNotFoundException("Board not found");
+            throw new ResourceNotFoundException("Entity not found");
         }
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
