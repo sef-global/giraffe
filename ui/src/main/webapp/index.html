@@ -4,17 +4,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description"
-          content="The dashboard displays your ranking based on successful web-based
-                                referrals engaged by your
-                                partner network in your university. The more you get your network to share SEF events
-                                using the
-                                custom generated links, the closer your get to reaching the number one spot in our
-                                Multiverse.">
+<!--    <meta name="description"-->
+<!--          content="">-->
     <meta name="author" content="Sustainable Education Foundation">
     <meta property="og:image" content="https://sefglobal.org/assets/img/ill/multiverse-meta-image.png">
     <meta name="twitter:image" content="https://sefglobal.org/assets/img/ill/multiverse-meta-image.png">
-    <title>SEF Multiverse Ranking</title>
+    <title>SEF Giraffe Board</title>
     <!-- Favicon -->
     <link href="assets/img/favicon.png" rel="icon" type="image/png">
     <!-- Fonts -->
@@ -24,10 +19,27 @@
     <link href="assets/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- Data Tables-->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
     <!-- Argon CSS -->
     <link type="text/css" href="assets/css/argon.css?v=1.0.1" rel="stylesheet">
     <!-- Global custom CSS -->
     <link type="text/css" href="assets/css/global-custom.css" rel="stylesheet">
+
+    <style>
+        .profile-image{
+            width: 64px;
+            margin-right: 24px;
+        }
+
+        .table tbody td{
+            vertical-align: middle;
+        }
+
+        /*#modal-score-history {*/
+        /*    width: 1000px;*/
+        /*    margin: auto;*/
+        /*}*/
+    </style>
 </head>
 
 <body>
@@ -54,10 +66,11 @@
                 <div class="container">
 
                     <div id="leader-board">
-                        <table id="example" class="table " style="width:100%">
+                        <table id="example" class="table table-hover" style="width:100%">
 
                             <thead>
                             <tr>
+                                <th width="48"></th>
                                 <th></th>
                                 <th>Rank</th>
                                 <th>Points</th>
@@ -77,6 +90,34 @@
 </main>
 
 <div id="footer"></div>
+<div class="modal fade" id="modal-score-history" tabindex="-1" role="dialog" aria-labelledby="modal-default"
+     aria-hidden="true">
+    <div class="modal-dialog modal- modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="modal-score-history-title"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="tbl-score-history" class="table display responsive" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Points</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
 
 <!-- Core -->
 <script src="assets/vendor/jquery/jquery.min.js"></script>
@@ -86,6 +127,7 @@
 <!--Data tables-->
 <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 <!--Mustache.js-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
 <!--Bootstrap notify-->
@@ -96,6 +138,8 @@
 <script src="assets/js/common-functions.js"></script>
 <!-- Script for static navbar and footer -->
 <script src="assets/js/navigation.js"></script>
+<!--Load page script-->
+<script src="assets/js/pages/index.js"></script>
 
 <!--Template to display main header-->
 <script type="text/html" id="template-main-header">
@@ -125,68 +169,8 @@
     </div>
 </script>
 
+<script type="text/html" id="template-profile-card">
 
-<script>
-    $(function () {
-        loadNavAndFooter('assets/content/static');  //relative path to content directory
-
-        const boardId = getUrlParameter("board");
-
-        if (boardId === undefined) {
-            $("#main-header").html($("#template-404").html());
-        } else {
-            loadMainHeader(boardId);
-            loadLeaderBoard(boardId);
-
-        }
-    });
-
-    function loadMainHeader(boardId) {
-        const url = window.location.origin + "/invoker/open/api/giraffe/v1/boards/" + boardId;
-        const template = $("#template-main-header");
-        const target = $("#main-header");
-        renderData(template, url, target, false);
-
-    }
-
-    function loadLeaderBoard(boardId) {
-        const url = window.location.origin + `/invoker/open/api/giraffe/v1/boards/${boardId}/scores`;
-        $('#example').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "bFilter": false,
-            "ordering": false,
-            "oLanguage": {
-                "oPaginate": {
-                    "sPrevious": '<i class="ni ni-bold-left"></i>',
-                    "sNext": '<i class="ni ni-bold-right"></i>'
-                }
-            },
-            ajax: {
-                "url": url,
-                data: function (params) {
-                    return {
-                        "limit": params.length,
-                        "offset": params.start
-                    };
-                },
-                "type": "GET",
-                dataFilter: function (data) {
-                    data = JSON.parse(data);
-                    data.recordsTotal = data.count;
-                    data.recordsFiltered = data.count;
-                    return JSON.stringify(data);
-                }
-            },
-            "columns": [
-                {"data": "name"},
-                {"data": "rank"},
-                {"data": "points"}
-            ]
-        });
-    }
 </script>
-
-</body>
 
 </html>

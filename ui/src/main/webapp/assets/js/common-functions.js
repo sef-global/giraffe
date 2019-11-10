@@ -102,3 +102,9 @@ function showNotification(type, message, timer = 2000) {
         }
     });
 }
+
+function convertPlainTextToHyperLinks(text) {
+    const regex = /((http:|https:)[^\s]+[\w])/g
+    // Replace plain text links by hyperlinks
+    return text.replace(regex, "<a href='$1' target='_blank'>$1</a>");
+}
