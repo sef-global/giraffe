@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.PreparedStatement;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +29,17 @@ public class ScoreDAO {
     private JdbcTemplate jdbcTemplate;
 
     public Score addScore(Score score) throws BadRequestException, ResourceNotFoundException {
-
         String sqlQuery = "" +
                 "INSERT INTO" +
                 "   score(" +
                 "       entity_id, " +
                 "       description, " +
                 "       points, " +
+                "       created_at, " +
                 "       status" +
                 "   ) " +
                 "VALUES " +
-                "   (?,?,?,'ACTIVE')";
+                "   (?,?,?,?,'ACTIVE')";
 
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -47,6 +48,7 @@ public class ScoreDAO {
                 ps.setInt(1, score.getEntityId());
                 ps.setString(2, score.getDescription());
                 ps.setInt(3, score.getPoints());
+                ps.setLong(4, new Date().getTime() / 1000);
                 return ps;
             }, keyHolder);
             int key = keyHolder.getKey().intValue();
@@ -162,13 +164,26 @@ public class ScoreDAO {
     public PaginatedResult getPaginatedEntitiesWithPointsByBoardId(int boardId, int limit, int offset) throws ResourceNotFoundException {
         String sqlQuery = "" +
                 "SELECT " +
-                "   COUNT(id) as count " +
+                "    COUNT(DISTINCT (e.id)) as count " +
                 "FROM " +
-                "   entity " +
+                "       entity e " +
+                "   INNER JOIN " +
+                "       score s " +
+                "   ON " +
+                "       e.id = s.entity_id " +
+                "   INNER JOIN " +
+                "       board b " +
+                "   ON " +
+                "       e.board_id = b.id " +
                 "WHERE " +
-                "   board_id = ? " +
+                "   b.status = 'ACTIVE' " +
                 "   AND " +
-                "   status='ACTIVE'";
+                "   b.id = ? " +
+                "   AND " +
+                "   e.status='ACTIVE' " +
+                "   AND " +
+                "   s.status='ACTIVE'";
+
         int count;
         try {
             count = jdbcTemplate.queryForObject(

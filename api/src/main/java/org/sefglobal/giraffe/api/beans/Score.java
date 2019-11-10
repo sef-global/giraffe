@@ -5,17 +5,10 @@ public class Score {
     private int entityId;
     private String description;
     private int points;
+    private long createdAt;
     private String status;
 
     public Score() {
-    }
-
-    public Score(int id, int entityId, String description, int points, String status) {
-        this.id = id;
-        this.entityId = entityId;
-        this.description = description;
-        this.points = points;
-        this.status = status;
     }
 
     public int getId() {
@@ -56,5 +49,13 @@ public class Score {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -40,6 +40,7 @@ public class BeanUtil {
         score.setEntityId(resultSet.getInt("entity_id"));
         score.setDescription(resultSet.getString("description"));
         score.setPoints(resultSet.getInt("points"));
+        score.setCreatedAt(resultSet.getInt("created_at"));
         score.setStatus(resultSet.getString("status"));
 
         return score;
