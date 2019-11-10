@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.sefglobal.giraffe</groupId>
     <artifactId>api</artifactId>
     <packaging>war</packaging>
 

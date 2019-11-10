@@ -164,9 +164,9 @@ public class ScoreDAO {
                 "SELECT " +
                 "   COUNT(id) as count " +
                 "FROM " +
-                "   score " +
+                "   entity " +
                 "WHERE " +
-                "   entity_id=? " +
+                "   board_id = ? " +
                 "   AND " +
                 "   status='ACTIVE'";
         int count;
