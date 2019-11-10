@@ -17,11 +17,11 @@
     <!-- Icons -->
     <link href="assets/vendor/nucleo/css/nucleo.css" rel="stylesheet">
     <link href="assets/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Argon CSS -->
+    <link type="text/css" href="assets/css/argon.css?v=1.0.1" rel="stylesheet">
     <!-- Data Tables-->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-    <!-- Argon CSS -->
-    <link type="text/css" href="assets/css/argon.css?v=1.0.1" rel="stylesheet">
     <!-- Global custom CSS -->
     <link type="text/css" href="assets/css/global-custom.css" rel="stylesheet">
 
@@ -76,9 +76,7 @@
                                 <th>Points</th>
                             </tr>
                             </thead>
-                            <tbody>
-
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
 
@@ -100,10 +98,11 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <table id="tbl-score-history" class="table display responsive" style="width:100%">
+            <div class="modal-body table-responsive">
+                <table width="100%" id="tbl-score-history" class="display responsive table" style="width:100%">
                     <thead>
                     <tr>
+                        <th></th>
                         <th>Points</th>
                         <th>Description</th>
                     </tr>
@@ -130,6 +129,8 @@
 <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 <!--Mustache.js-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+<!--Moment.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 <!--Bootstrap notify-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.7/bootstrap-notify.min.js"></script>
 <!-- Argon JS -->
