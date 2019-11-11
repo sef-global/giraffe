@@ -225,7 +225,7 @@ public class ScoreDAO {
                 "   AND " +
                 "   e.status='ACTIVE' " +
                 "   AND " +
-                "   s.status='ACTIVE'" +
+                "   s.status='ACTIVE' " +
                 "GROUP BY " +
                 "   entity_id " +
                 "ORDER BY " +
